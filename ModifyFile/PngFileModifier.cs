@@ -12,6 +12,9 @@ namespace ModifyFile
     {
         public bool canModify(FileInfo file)
         {
+            if (file.Name.EndsWith(".9.png")){
+                return false;
+            }
             String ext = file.Extension.ToLower();
             switch (ext)
             {
@@ -46,11 +49,11 @@ namespace ModifyFile
                     {
                         if (pixel.A > 125)
                         {
-                            bitmap.SetPixel(x, y, Color.FromArgb(pixel.A - random.Next(1,5), pixel));
+                            bitmap.SetPixel(x, y, Color.FromArgb(pixel.A - random.Next(1,3), pixel));
                         }
                         else
                         {
-                            bitmap.SetPixel(x, y, Color.FromArgb(pixel.A + random.Next(1,5), pixel));
+                            bitmap.SetPixel(x, y, Color.FromArgb(pixel.A + random.Next(1,3), pixel));
                         }
                         break;
                     }

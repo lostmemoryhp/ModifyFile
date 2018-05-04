@@ -43,6 +43,26 @@ namespace ModifyFile
 
         private void btnStart_Click(object sender, EventArgs e)
         {
+            //AppendContent appendText = new AppendContent
+            //{
+            //    X = 12,
+            //    Y = 21,
+            //    RGBType = RGBTypeEnum.G,
+            //    Value = 123
+            //};
+            //AppendContent appendText2 = new AppendContent
+            //{
+            //    X = 45,
+            //    Y = 112,
+            //    RGBType = RGBTypeEnum.R,
+            //    Value = 21
+            //};
+            //var builder = new AppendContentBuilder();
+            //builder.Contents.Add(appendText);
+            //builder.Contents.Add(appendText2);
+            //var s = builder.ToString();
+            //var app = AppendContentBuilder.FromString(s);
+
             txtInfo.Clear();
             dir = txtDir.Text.Trim();
             if (string.IsNullOrEmpty(dir))
