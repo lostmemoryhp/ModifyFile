@@ -57,8 +57,8 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Png.cs" />
+    <Compile Include="JPGFileModifier.cs" />
     <Compile Include="PngFileModifier.cs" />
-    <Compile Include="ImageFileModifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

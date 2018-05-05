@@ -11,5 +11,6 @@ namespace ModifyFile
     {
         bool canModify(FileInfo file);
         void modify(FileInfo file);
+        void recovery(FileInfo file);
     }
 }

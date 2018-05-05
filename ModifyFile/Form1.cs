@@ -20,8 +20,8 @@ namespace ModifyFile
         public frmMain()
         {
             InitializeComponent();
-            //fileModifiers.Add(new ImageFileModifier());
             fileModifiers.Add(new PngFileModifier());
+            fileModifiers.Add(new JPGFileModifier());
             m_SyncContext = SynchronizationContext.Current;
         }
 
@@ -43,31 +43,12 @@ namespace ModifyFile
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            //AppendContent appendText = new AppendContent
-            //{
-            //    X = 12,
-            //    Y = 21,
-            //    RGBType = RGBTypeEnum.G,
-            //    Value = 123
-            //};
-            //AppendContent appendText2 = new AppendContent
-            //{
-            //    X = 45,
-            //    Y = 112,
-            //    RGBType = RGBTypeEnum.R,
-            //    Value = 21
-            //};
-            //var builder = new AppendContentBuilder();
-            //builder.Contents.Add(appendText);
-            //builder.Contents.Add(appendText2);
-            //var s = builder.ToString();
-            //var app = AppendContentBuilder.FromString(s);
 
             txtInfo.Clear();
             dir = txtDir.Text.Trim();
             if (string.IsNullOrEmpty(dir))
             {
-                MessageBox.Show("请选择文件夹。");
+                AppendText("请选择文件夹。");
                 return;
             }
             EnabledControl(false);
@@ -81,7 +62,7 @@ namespace ModifyFile
                 m_SyncContext.Post(state =>
                 {
                     EnabledControl(true);
-                    MessageBox.Show("修改完成");
+                    AppendText("修改完成\n");
                 }, null);
             });
         }
@@ -91,6 +72,7 @@ namespace ModifyFile
             txtDir.Enabled = enabled;
             btnSelectFolder.Enabled = enabled;
             btnStart.Enabled = enabled;
+            btnRecovery.Enabled = enabled;
         }
 
         void changeDir(string parentdir)
@@ -103,7 +85,7 @@ namespace ModifyFile
             }
             //SetText("目录====" + dir.FullName);
             var files = dir.EnumerateFiles().ToList();
-            files.AsParallel().ForAll(f =>
+            files.ForEach(f =>
             {
                 foreach (var fm in fileModifiers)
                 {
@@ -138,6 +120,73 @@ namespace ModifyFile
             }
         }
 
+        private void btnRecovery_Click(object sender, EventArgs e)
+        {
+            txtInfo.Clear();
+            dir = txtDir.Text.Trim();
+            if (string.IsNullOrEmpty(dir))
+            {
+                AppendText("请选择文件夹。");
+                return;
+            }
+            EnabledControl(false);
+            Task.Run(() =>
+            {
+                recoveryDir(dir);
+            })
+            .ContinueWith(t =>
+            {
+                m_SyncContext.Post(state =>
+                {
+                    EnabledControl(true);
+                    AppendText("恢复完成");
+                }, null);
+            });
+        }
 
+        void recoveryDir(String parentdir)
+        {
+            DirectoryInfo dir = new DirectoryInfo(parentdir);
+            if (dir.Name.StartsWith(".") || dir.Name.ToLower() == "build")
+            {
+                AppendText("跳过====" + dir.FullName);
+                return;
+            }
+            //SetText("目录====" + dir.FullName);
+            var files = dir.EnumerateFiles().ToList();
+            files.ForEach(f =>
+            {
+                foreach (var fm in fileModifiers)
+                {
+                    try
+                    {
+                        if (fm.canModify(f))
+                        {
+                            try
+                            {
+                                fm.recovery(f);
+                                AppendText("恢复文件====" + f.FullName);
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                AppendText("出错，" + f.FullName + " == " + ex.Message);
+                            }
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        AppendText("canModify出错，" + f.FullName + " == " + e.Message);
+                    }
+
+                }
+            });
+            var children = dir.EnumerateDirectories().ToList();
+            foreach (var childDir in children)
+            {
+                changeDir(childDir.FullName);
+            }
+        }
     }
 }
